@@ -16,6 +16,11 @@ public class CourseService {
 	@Autowired
 	private CourseRepository courseRepository;
 
+	public CourseService(CourseRepository courseRepository) {
+		super();
+		this.courseRepository = courseRepository;
+	}
+
 	public List<Course> getAllCourses() {
 
 		List<Course> courses = new ArrayList<>();
@@ -25,24 +30,20 @@ public class CourseService {
 
 	public Course getCourse(String id) {
 		Optional<Course> course = courseRepository.findById(id);
-		if (course.isPresent()) {
-			return course.get();
-		}
-		return null;
+		return course.get();
 	}
 
 	public String addCourse(Course course) {
 		courseRepository.save(course);
-		return "/Added: " + course;
+		return "Added: " + course;
 	}
 
 	public String updateCourse(Course course, String id) {
-
-		if (courseRepository.findById(id).isPresent()) {
+		if (courseRepository.findById(id).get().getCourseId() == course.getCourseId()) {
 			courseRepository.save(course);
-			return "Updated: " + course;
 		}
-		return "No Courses found to Update";
+		return "Updated: " + course;
+
 	}
 
 	public String removeCourse(String id) {

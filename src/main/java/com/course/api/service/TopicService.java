@@ -1,13 +1,11 @@
 package com.course.api.service;
 
 import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.course.api.domain.Course;
 import com.course.api.domain.Topic;
 import com.course.api.repository.CourseRepository;
 import com.course.api.repository.TopicRepository;
@@ -21,6 +19,12 @@ public class TopicService {
 	@Autowired
 	CourseRepository courseRepository;
 
+	public TopicService(TopicRepository topicRepository, CourseRepository courseRepository) {
+		super();
+		this.topicRepository = topicRepository;
+		this.courseRepository = courseRepository;
+	}
+
 	public List<Topic> getAllTopics() {
 
 		List<Topic> topics = new ArrayList<>();
@@ -29,11 +33,8 @@ public class TopicService {
 	}
 
 	public Topic getTopic(String id) {
-		Optional<Topic> topic = topicRepository.findById(id);
-		if (topic.isPresent()) {
-			return topic.get();
-		}
-		return null;
+		return topicRepository.findById(id).get();
+
 	}
 
 	public String addTopic(Topic topic) {
@@ -43,27 +44,18 @@ public class TopicService {
 
 	public String addCourseToTopic(String topicId, String courseId) {
 
-		Optional<Topic> optionalTopic = topicRepository.findById(topicId);
-		if (optionalTopic.isPresent()) {
-			Optional<Course> optionalCourse = courseRepository.findById(courseId);
-			if (optionalCourse.isPresent()) {
-				Topic topic = optionalTopic.get();
-				topic.setCourse(optionalCourse.get());
-				topicRepository.save(topic);
-				return "Added: " + topic.getCourse();
-			}
-			return "No Course Present";
-		}
-		return "No Topic Present";
+		Topic topic = topicRepository.findById(topicId).get();
+		topic.setCourse(courseRepository.findById(courseId).get());
+		topicRepository.save(topic);
+		return "Added: " + topic.getCourse();
 	}
 
 	public String updateTopic(Topic topic, String id) {
 
-		if (topicRepository.findById(id).isPresent()) {
+		if (topicRepository.findById(id).get().getTopicId() == topic.getTopicId()) {
 			topicRepository.save(topic);
-			return "Updated: " + topic;
 		}
-		return "No Topics found to Update";
+		return "Updated: " + topic;
 	}
 
 	public String removeTopic(String id) {
